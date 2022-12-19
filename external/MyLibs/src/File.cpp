@@ -31,6 +31,14 @@ namespace ml {
         o_stream.close();
     }
 
+    bool File::is_exist() {
+        bool is_exist = false;
+        i_stream = std::ifstream(filepath.head);
+        is_exist = i_stream.is_open();
+        i_stream.close();
+        return is_exist;
+    }
+
     File::~File() {
         if (i_stream.is_open()) i_stream.close();
         if (o_stream.is_open()) o_stream.close();

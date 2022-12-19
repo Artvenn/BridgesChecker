@@ -12,6 +12,7 @@ namespace ml {
         File(const Str& str);
         Str read();
         void write(const Str& data);
+        bool is_exist();
         ~File();
     };
 }
