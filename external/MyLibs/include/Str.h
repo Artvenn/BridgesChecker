@@ -1,5 +1,6 @@
 #pragma once
 #include "./TypeAliases.h"
+#include <iostream>
 
 namespace ml {
     template <typename T> class Arr;

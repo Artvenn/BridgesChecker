@@ -9,11 +9,13 @@ add_library(${PROJECT_NAME} STATIC
     ./include/Str.h
     ./include/System.h
     ./include/TypeAliases.h
+    ./include/Convert.h
 
     ./src/File.cpp
     ./src/Memory.cpp
     ./src/Str.cpp
     ./src/System.cpp
+    ./src/Convert.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ./include)
