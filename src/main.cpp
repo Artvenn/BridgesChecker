@@ -39,7 +39,13 @@ i32 main(i32 argc, const char** argv) {
     auto working_file = ml::File("./working.txt");
 
     for (i32 i = 0; i < bridges_lines.len(); i++) {
-        auto ip_port = bridges_lines[i].trim().split(' ')[1];
+        ml::Str ip_port;
+        if (bridges_lines[i].trim().split(' ')[0] == "obfs4") {
+            ip_port = bridges_lines[i].trim().split(' ')[1];
+        } else {
+            ip_port = bridges_lines[i].trim().split(' ')[0];
+        }
+
         auto splited_ip_port = ip_port.split(':');
         ip = splited_ip_port[0];
         port = ml::Convert::str_to_i32(splited_ip_port[1]);
@@ -70,17 +76,27 @@ i32 main(i32 argc, const char** argv) {
             getsockopt(sock, SOL_SOCKET, SO_ERROR, &so_error, &len);
 
             if (so_error == 0) {
-                std::cout << "[OK]\t\t" << ip << ":" << port << std::endl;
+                std::cout << "[\033[1;32mOK\033[0m]\t"
+                    << ip << ":" << port << std::endl;
                 working = working + bridges_lines[i].trim() + "\n";
             } else {
-                std::cout << "[FAIL]\t\t" << ip << ":" << port << std::endl;
+                std::cout << "[\033[1;31mFAIL\033[0m]\t"
+                    << ip << ":" << port << std::endl;
             }
         }
 
         close(sock);
     }
-
-    working_file.write(working);
+    std::cout << "----------------------------------------------------" << std::endl;
+    if (working != "") {
+        std::cout << "\t\tFound bridges:" << std::endl;
+        std::cout << working << std::endl;
+        std::cout << "----------------------------------------------------" << std::endl;
+        std::cout << "saved to -> working.txt file" << std::endl;
+        working_file.write(working);
+    } else {
+        std::cout << "Nothing is found" << std::endl;
+    }
 
     return 0;
 }
