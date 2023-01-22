@@ -19,11 +19,30 @@
 
 i32 main(i32 argc, const char** argv) {
     if (argc == 1) {
-        std::cerr << "Please, specify path to bridges" << std::endl;
+        std::cerr << "At least one parameter -p --path is required" << std::endl;
         exit(-1);
     }
 
-    auto bridges_path = ml::Str(argv[1]);
+    ml::Arr<ml::Str> args;
+    for (i32 i = 1; i < argc; i++) args.push(ml::Str(argv[i]));
+
+    auto p_param_index = args.first_where([](auto el) {return el == ml::Str("-p");});
+    auto path_param_index = args.first_where([](auto el) {return el == ml::Str("--path");});
+    auto dp_param_index = args.first_where([](auto el){return el == ml::Str("-dp");});
+    auto default_port_param_index = args.first_where([](auto el){return el == ml::Str("--default_port");});
+
+    if (p_param_index == -1 && path_param_index == -1) {
+        std::cerr << "Missing of the required parameter --path / -p" << std::endl;
+        exit(-1);
+    }
+    ml::Str bridges_path;
+
+    if (p_param_index =! -1) {
+        bridges_path = args[p_param_index+1];
+    } else if (path_param_index != -1) {
+        bridges_path = args[path_param_index+1];
+    } 
+
     auto bridges_file = ml::File(bridges_path);
     if (!bridges_file.is_exist()) {
         std::cerr << "file: " << bridges_path << " is not exist" << std::endl;
@@ -33,7 +52,6 @@ i32 main(i32 argc, const char** argv) {
     auto bridges_lines = bridges_file.read().trim().split('\n');
     ml::Str ip;
     u16 port;
-    ml::Str log; 
     ml::Str working; 
 
     auto working_file = ml::File("./working.txt");
@@ -48,7 +66,14 @@ i32 main(i32 argc, const char** argv) {
 
         auto splited_ip_port = ip_port.split(':');
         ip = splited_ip_port[0];
-        port = ml::Convert::str_to_i32(splited_ip_port[1]);
+
+        if (dp_param_index != -1) {
+            port = ml::Convert::str_to_i32(args[dp_param_index+1]);
+        } else if (default_port_param_index != -1) {
+            port = ml::Convert::str_to_i32(args[default_port_param_index+1]);
+        } else {
+            port = ml::Convert::str_to_i32(splited_ip_port[1]);
+        }
 
         struct sockaddr_in address;  
         i16 sock = -1;        
